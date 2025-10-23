@@ -8,14 +8,95 @@ service: cognito
 provider:
   name: aws
   runtime: nodejs20.x
+  region: ap-south-1
+  httpApi:
+    cors: true
+  environment:
+    REGION: 'ap-south-1'
+    COGNITO_USER_POOL_ID: !Ref CognitoUserPool
+    COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
   # Uncomment to easily set up a custom domain. Read the docs for more details:
   # https://www.serverless.com/framework/docs/providers/aws/guide/domains
   # domain: api.example.com
 
+resources:
+  Resources:
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: myUserPool
+        # AliasAttributes:
+        #   - email
+        AutoVerifiedAttributes:
+          - email
+        Schema:
+          - Name: name
+            AttributeDataType: String
+            Required: true
+            Mutable: true
+          - Name: email
+            AttributeDataType: String
+            Required: true
+            Mutable: true
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireUppercase: true
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireSymbols: true
+
+    CognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: myUserPoolClient
+        UserPoolId:
+          Ref: CognitoUserPool
+        GenerateSecret: false
+        ExplicitAuthFlows:
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_USER_SRP_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+        RefreshTokenValidity: 30
+        AccessTokenValidity: 24
+        IdTokenValidity: 24
+        TokenValidityUnits:
+          RefreshToken: days
+          AccessToken: hours
+          IdToken: hours
+        SupportedIdentityProviders:
+          - COGNITO
+        PreventUserExistenceErrors: ENABLED
+
+
 functions:
-  hello:
-    handler: handler.hello
+  signUp:
+    handler: src/signUp.signUp
     events:
       - httpApi:
-          path: /
+          path: /signup
+          method: post
+  confirmSignUp:
+    handler: src/signUp.confirmSignUp
+    events:
+      - httpApi:
+          path: /confirm-signup
+          method: post
+  signIn:
+    handler: src/signIn.signIn
+    events:
+      - httpApi:
+          path: /signin
+          method: post
+  signOut:
+    handler: src/signOut.signOut
+    events:
+      - httpApi:
+          path: /signout
+          method: get
+  userInfo:
+    handler: src/userInfo.userInfo
+    events:
+      - httpApi:
+          path: /user-info
           method: get
