@@ -94,6 +94,18 @@ functions:
       - httpApi:
           path: /signout
           method: get
+  forgotPassword:
+    handler: src/forgotPassword.forgotPassword
+    events:
+      - httpApi:
+          path: /forgot-password
+          method: post
+  confirmForgotPassword:
+    handler: src/forgotPassword.confirmForgotPassword
+    events:
+      - httpApi:
+          path: /confirm-forgot-password
+          method: post
   userInfo:
     handler: src/userInfo.userInfo
     events:

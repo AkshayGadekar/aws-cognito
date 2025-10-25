@@ -1,4 +1,4 @@
-const { CognitoIdentityProviderClient, SignUpCommand, ConfirmSignUpCommand, InitiateAuthCommand, GlobalSignOutCommand, GetUserCommand } = require('@aws-sdk/client-cognito-identity-provider')
+const { CognitoIdentityProviderClient, SignUpCommand, ConfirmSignUpCommand, InitiateAuthCommand, GlobalSignOutCommand, ForgotPasswordCommand, ConfirmForgotPasswordCommand, GetUserCommand } = require('@aws-sdk/client-cognito-identity-provider')
 
 const region = process.env.REGION
 const UserPoolId = process.env.COGNITO_USER_POOL_ID
@@ -51,6 +51,26 @@ exports.signIn = async (email, password) => {
 exports.signOut = async (AccessToken) => {
     const command = new GlobalSignOutCommand({
         AccessToken
+    })
+
+    await client.send(command)
+}
+
+exports.forgotPassword = async (email) => {
+    const command = new ForgotPasswordCommand({
+        ClientId,
+        Username: email
+    })
+
+    await client.send(command)
+}
+
+exports.confirmForgotPassword = async (email, code, newPassword) => {
+    const command = new ConfirmForgotPasswordCommand({
+        ClientId,
+        Username: email,
+        ConfirmationCode: code.toString(),
+        Password: newPassword
     })
 
     await client.send(command)
