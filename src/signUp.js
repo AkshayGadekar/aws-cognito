@@ -2,7 +2,7 @@ const { signUp, confirmSignUp } = require('../cognito')
 
 exports.signUp = async (event) => {
     try {
-        const { name, email, password } = JSON.parse(event.body)
+        const { name, email, password, phoneNumber, gender, timeZone, birthdate, picture } = JSON.parse(event.body)
         if (!name || !email || !password) {
             return {
                 statusCode: 422,
@@ -12,9 +12,7 @@ exports.signUp = async (event) => {
             }
         }
 
-        await signUp(name, email, password)
-        
-        // to do: auto verify email and confirm the account, disable auto verification
+        await signUp(name, email, password, phoneNumber, gender, timeZone, birthdate, picture)
 
         return {
             statusCode: 200,

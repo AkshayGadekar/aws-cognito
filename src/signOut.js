@@ -1,16 +1,9 @@
 const { signOut } = require('../cognito')
+const { authMiddleware } = require('./middleware/auth')
 
-exports.signOut = async (event) => {
+const signOutHandler = async (event) => {
     try {
-        const accessToken = event.headers.authorization.split(' ')[1]
-        if (!accessToken) {
-            return {
-                statusCode: 401,
-                body: JSON.stringify({
-                    msg: 'Unauthorized'
-                })
-            }
-        }
+        const accessToken = event.accessToken
 
         await signOut(accessToken)
         
@@ -31,3 +24,5 @@ exports.signOut = async (event) => {
         }
     }
 }
+
+exports.signOut = authMiddleware(signOutHandler)

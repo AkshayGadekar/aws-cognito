@@ -15,6 +15,14 @@ provider:
     REGION: 'ap-south-1'
     COGNITO_USER_POOL_ID: !Ref CognitoUserPool
     COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
+    S3_BUCKET_NAME: !Ref ProfilePicturesBucket
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+      Resource:
+        - !Sub arn:aws:s3:::${ProfilePicturesBucket}/*
   # Uncomment to easily set up a custom domain. Read the docs for more details:
   # https://www.serverless.com/framework/docs/providers/aws/guide/domains
   # domain: api.example.com
@@ -38,6 +46,30 @@ resources:
             AttributeDataType: String
             Required: true
             Mutable: true
+          - Name: phone_number
+            AttributeDataType: String
+            Required: false
+            Mutable: true
+          - Name: gender
+            AttributeDataType: String
+            Required: false
+            Mutable: true
+          - Name: updated_at
+            AttributeDataType: Number
+            Required: false
+            Mutable: true
+          - Name: zoneinfo
+            AttributeDataType: String
+            Required: false
+            Mutable: true
+          - Name: birthdate
+            AttributeDataType: String
+            Required: false
+            Mutable: true
+          - Name: picture
+            AttributeDataType: String
+            Required: false
+            Mutable: true
         Policies:
           PasswordPolicy:
             MinimumLength: 8
@@ -45,7 +77,6 @@ resources:
             RequireLowercase: true
             RequireNumbers: true
             RequireSymbols: true
-
     CognitoUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
@@ -67,6 +98,27 @@ resources:
         SupportedIdentityProviders:
           - COGNITO
         PreventUserExistenceErrors: ENABLED
+    ProfilePicturesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: profile-pictures-bucket-${self:provider.region}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        VersioningConfiguration:
+          Status: Enabled
+        LifecycleConfiguration:
+          Rules:
+            - Id: DeleteIncompleteMultipartUploads
+              Status: Enabled
+              AbortIncompleteMultipartUpload:
+                DaysAfterInitiation: 1
+            - Id: DeleteOldVersions
+              Status: Enabled
+              NoncurrentVersionExpirationInDays: 30
+
 
 
 functions:
@@ -112,3 +164,28 @@ functions:
       - httpApi:
           path: /user-info
           method: get
+  updateUser:
+    handler: src/userInfo.updateUser
+    events:
+      - httpApi:
+          path: /update-user
+          method: patch
+  generatePresignedUrl:
+    handler: src/userInfo.generatePresignedUrl
+    events:
+      - httpApi:
+          path: /generate-presigned-url
+          method: post
+  getPresignedPictureUrl:
+    handler: src/userInfo.getPresignedPictureUrl
+    events:
+      - httpApi:
+          path: /get-presigned-picture-url
+          method: post
+  deleteUser:
+    handler: src/userInfo.deleteUser
+    events:
+      - httpApi:
+          path: /delete-user
+          method: delete
+  
