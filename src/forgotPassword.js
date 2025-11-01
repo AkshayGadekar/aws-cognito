@@ -1,5 +1,6 @@
-const { forgotPassword, confirmForgotPassword } = require('../cognito')
+const { forgotPassword, confirmForgotPassword, changePassword } = require('../cognito')
 const { validateFields } = require('./validations')
+const { authMiddleware } = require('./middleware/auth')
 
 exports.forgotPassword = async (event) => {
     try {
@@ -51,17 +52,18 @@ exports.confirmForgotPassword = async (event) => {
     }
 }
 
-exports.resetPassword = async (event) => {
+const changePasswordHandler = async (event) => {
     try {
-        const { email, code, newPassword } = JSON.parse(event.body)
-        validateFields({ email, code, newPassword })
+        const accessToken = event.accessToken
+        const { currentPassword, newPassword } = JSON.parse(event.body)
+        validateFields({ currentPassword, newPassword })
 
-        await confirmForgotPassword(email, code, newPassword)
+        await changePassword(accessToken, currentPassword, newPassword)
         
         return {
             statusCode: 200,
             body: JSON.stringify({
-                msg: "Password has been sucessfully reset."
+                msg: "Password has been successfully changed."
             })
         }
     } catch (error) {
@@ -75,3 +77,5 @@ exports.resetPassword = async (event) => {
         }
     }   
 }
+
+exports.changePassword = authMiddleware(changePasswordHandler)

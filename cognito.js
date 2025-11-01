@@ -1,4 +1,4 @@
-const { CognitoIdentityProviderClient, DescribeUserPoolCommand, AdminUpdateUserAttributesCommand, AdminConfirmSignUpCommand, SignUpCommand, ConfirmSignUpCommand, InitiateAuthCommand, GlobalSignOutCommand, ForgotPasswordCommand, ConfirmForgotPasswordCommand, GetUserCommand, UpdateUserAttributesCommand, DeleteUserCommand } = require('@aws-sdk/client-cognito-identity-provider')
+const { CognitoIdentityProviderClient, DescribeUserPoolCommand, AdminUpdateUserAttributesCommand, AdminConfirmSignUpCommand, SignUpCommand, ConfirmSignUpCommand, InitiateAuthCommand, GlobalSignOutCommand, ForgotPasswordCommand, ConfirmForgotPasswordCommand, GetUserCommand, UpdateUserAttributesCommand, DeleteUserCommand, ChangePasswordCommand } = require('@aws-sdk/client-cognito-identity-provider')
 const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3')
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner')
 
@@ -102,6 +102,16 @@ exports.confirmForgotPassword = async (email, code, newPassword) => {
         Username: email,
         ConfirmationCode: code.toString(),
         Password: newPassword
+    })
+
+    await client.send(command)
+}
+
+exports.changePassword = async (AccessToken, PreviousPassword, ProposedPassword) => {
+    const command = new ChangePasswordCommand({
+        AccessToken,
+        PreviousPassword,
+        ProposedPassword
     })
 
     await client.send(command)

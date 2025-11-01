@@ -169,6 +169,12 @@ functions:
       - httpApi:
           path: /confirm-forgot-password
           method: post
+  changePassword:
+    handler: src/forgotPassword.changePassword
+    events:
+      - httpApi:
+          path: /change-password
+          method: post
   userInfo:
     handler: src/userInfo.userInfo
     events:
