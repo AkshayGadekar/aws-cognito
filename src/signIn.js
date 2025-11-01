@@ -1,17 +1,11 @@
 
 const { signIn } = require('../cognito')
+const { validateFields } = require('./validations')
 
 exports.signIn = async (event) => {
     try {
         const { email, password } = JSON.parse(event.body)
-        if (!email || !password) {
-            return {
-                statusCode: 422,
-                body: JSON.stringify({
-                    msg: 'Email and password are required'
-                })
-            }
-        }
+        validateFields({ email, password })
 
         const response = await signIn(email, password)
 

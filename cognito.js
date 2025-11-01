@@ -1,4 +1,4 @@
-const { CognitoIdentityProviderClient, SignUpCommand, ConfirmSignUpCommand, InitiateAuthCommand, GlobalSignOutCommand, ForgotPasswordCommand, ConfirmForgotPasswordCommand, GetUserCommand, UpdateUserAttributesCommand, DeleteUserCommand } = require('@aws-sdk/client-cognito-identity-provider')
+const { CognitoIdentityProviderClient, DescribeUserPoolCommand, AdminUpdateUserAttributesCommand, AdminConfirmSignUpCommand, SignUpCommand, ConfirmSignUpCommand, InitiateAuthCommand, GlobalSignOutCommand, ForgotPasswordCommand, ConfirmForgotPasswordCommand, GetUserCommand, UpdateUserAttributesCommand, DeleteUserCommand } = require('@aws-sdk/client-cognito-identity-provider')
 const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3')
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner')
 
@@ -15,40 +15,45 @@ const s3Client = new S3Client({
     region
 })
 
-exports.signUp = async (name, email, password, phoneNumber, gender, timeZone, birthdate, picture) => {
-    const attributes = [
-        { Name: 'name', Value: name },
-        { Name: 'email', Value: email },
-    ]
-
-    if (phoneNumber) {
-        attributes.push({ Name: 'phone_number', Value: phoneNumber })
-    }
-
-    if (gender) {
-        attributes.push({ Name: 'gender', Value: gender })
-    }
-
-    if (timeZone) {
-        attributes.push({ Name: 'zoneinfo', Value: timeZone })
-    }
-
-    if (birthdate) {
-        attributes.push({ Name: 'birthdate', Value: birthdate })
-    }
-
-    if (picture) {
-        attributes.push({ Name: 'picture', Value: picture })
-    }
-
-    attributes.push({ Name: 'updated_at', Value: Date.now().toString() }) // in milliseconds
-
-    const command = new SignUpCommand({ ClientId, Username: email, Password: password, UserAttributes: attributes })
+exports.signUp = async (Username, Password, attributes) => {
+    const command = new SignUpCommand({ ClientId, Username, Password, UserAttributes: attributes })
 
     await client.send(command)
 }
 
-exports.confirmSignUp = async (email, confirmationCode) => {
+exports.isEmailAutoVerified = async () => {
+    const command = new DescribeUserPoolCommand({
+        UserPoolId
+    })
+    
+    const response = await client.send(command)
+    const autoVerifiedAttributes = response.UserPool?.AutoVerifiedAttributes || []
+    
+    return autoVerifiedAttributes.includes('email')
+}
+
+exports.markEmailAsVerified = async (email) => {
+    const command = new AdminUpdateUserAttributesCommand({
+        UserPoolId,
+        Username: email,
+        UserAttributes: [
+            { Name: "email_verified", Value: "true" },
+        ]
+    })
+
+    await client.send(command)
+}
+
+exports.confirmAccountManually = async (email) => {
+    const command = new AdminConfirmSignUpCommand({
+        UserPoolId,
+        Username: email,
+    })
+
+    await client.send(command)
+}
+
+exports.confirmAccountByCode = async (email, confirmationCode) => {
     console.log('Confirming sign up for email:', email, 'with confirmation code:', confirmationCode.toString())
     const command  = new ConfirmSignUpCommand({
         ClientId,
@@ -141,19 +146,6 @@ exports.uploadPicture = async (AccessToken, picture) => {
 }
 
 exports.generatePresignedUrl = async (filename, fileType, user) => {
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-    if (!allowedTypes.includes(fileType)) {
-        throw new Error('Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.')
-    }
-    
-    // Validate file extension
-    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
-    const ext = filename.toLowerCase().substring(filename.lastIndexOf('.'))
-    if (!allowedExtensions.includes(ext)) {
-        throw new Error('Invalid file extension.')
-    }
-
     const sub = user.attributes.sub
     
     // Create unique key with user identifier
@@ -165,7 +157,9 @@ exports.generatePresignedUrl = async (filename, fileType, user) => {
         ContentType: fileType
     })
     
-    const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 })
+    const url = await getSignedUrl(s3Client, command, { 
+        expiresIn: 3600 
+    })
     
     return {
         url,

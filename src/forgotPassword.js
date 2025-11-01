@@ -1,8 +1,10 @@
 const { forgotPassword, confirmForgotPassword } = require('../cognito')
+const { validateFields } = require('./validations')
 
 exports.forgotPassword = async (event) => {
     try {
         const { email } = JSON.parse(event.body)
+        validateFields({ email })
 
         await forgotPassword(email)
         
@@ -27,6 +29,7 @@ exports.forgotPassword = async (event) => {
 exports.confirmForgotPassword = async (event) => {
     try {
         const { email, code, newPassword } = JSON.parse(event.body)
+        validateFields({ email, code, newPassword })
 
         await confirmForgotPassword(email, code, newPassword)
         
@@ -46,4 +49,29 @@ exports.confirmForgotPassword = async (event) => {
             })
         }
     }
+}
+
+exports.resetPassword = async (event) => {
+    try {
+        const { email, code, newPassword } = JSON.parse(event.body)
+        validateFields({ email, code, newPassword })
+
+        await confirmForgotPassword(email, code, newPassword)
+        
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                msg: "Password has been sucessfully reset."
+            })
+        }
+    } catch (error) {
+        console.error(error)
+        return {
+            statusCode: 400,
+            body: JSON.stringify({
+                msg: error.message,
+                error: error.stack
+            })
+        }
+    }   
 }

@@ -1,5 +1,7 @@
 const { updateUserInfo, deleteUser, generatePresignedUrl, getPresignedPictureUrl } = require('../cognito')
 const { authMiddleware } = require('./middleware/auth')
+const { validateFields } = require('./validations')
+const { makeAttributes } = require('./helpers')
 
 const getUserInfoHandler = async (event) => {
     try {
@@ -30,33 +32,7 @@ const updateUserHandler = async (event) => {
         const accessToken = event.accessToken
         const { name, phoneNumber, gender, timeZone, birthdate, picture } = JSON.parse(event.body)
 
-        const attributes = []
-    
-        if (name) {
-            attributes.push({ Name: 'name', Value: name })
-        }
-
-        if (phoneNumber) {
-            attributes.push({ Name: 'phone_number', Value: phoneNumber })
-        }
-
-        if (gender) {
-            attributes.push({ Name: 'gender', Value: gender })
-        }
-
-        if (timeZone) {
-            attributes.push({ Name: 'zoneinfo', Value: timeZone })
-        }
-
-        if (birthdate) {
-            attributes.push({ Name: 'birthdate', Value: birthdate })
-        }
-
-        if (picture) {
-            attributes.push({ Name: 'picture', Value: picture })
-        }
-
-        attributes.push({ Name: 'updated_at', Value: Date.now().toString() }) // in milliseconds
+        const attributes = makeAttributes({name, phoneNumber, gender, timeZone, birthdate, picture})
 
         await updateUserInfo(accessToken, attributes)
 
@@ -83,16 +59,7 @@ const generatePresignedUrlHandler = async (event) => {
     try {
         const user = event.user
         const { filename, fileType } = JSON.parse(event.body)
-        
-        // Validations
-        if (!filename || !fileType) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ 
-                    msg: 'Filename and fileType are required' 
-                })
-            }
-        }
+        validateFields({ filename, fileType })
         
         const { url, pictureUrl } = await generatePresignedUrl(filename, fileType, user)
         
@@ -120,15 +87,7 @@ const generatePresignedUrlHandler = async (event) => {
 const getPresignedPictureUrlHandler = async (event) => {
     try {
         const { pictureUrl } = JSON.parse(event.body)
-
-        if (!pictureUrl) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    msg: "Picture URL is required"
-                })
-            }
-        }
+        validateFields({ picture: pictureUrl })
         
         const presignedUrl = await getPresignedPictureUrl(pictureUrl)
         

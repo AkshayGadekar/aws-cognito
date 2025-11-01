@@ -23,6 +23,13 @@ provider:
         - s3:GetObject
       Resource:
         - !Sub arn:aws:s3:::${ProfilePicturesBucket}/*
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminConfirmSignUp
+        - cognito-idp:AdminUpdateUserAttributes
+        - cognito-idp:DescribeUserPool
+      Resource:
+        - !Sub arn:aws:cognito-idp:${self:provider.region}:${AWS::AccountId}:userpool/${CognitoUserPool}
   # Uncomment to easily set up a custom domain. Read the docs for more details:
   # https://www.serverless.com/framework/docs/providers/aws/guide/domains
   # domain: api.example.com
@@ -33,8 +40,6 @@ resources:
       Type: AWS::Cognito::UserPool
       Properties:
         UserPoolName: myUserPool
-        # AliasAttributes:
-        #   - email
         AutoVerifiedAttributes:
           - email
         Schema:
@@ -128,11 +133,17 @@ functions:
       - httpApi:
           path: /signup
           method: post
-  confirmSignUp:
-    handler: src/signUp.confirmSignUp
+  confirmAccountByCode:
+    handler: src/signUp.confirmAccountByCode
     events:
       - httpApi:
-          path: /confirm-signup
+          path: /confirm-account-by-code
+          method: post
+  confirmAccountManually:
+    handler: src/signUp.confirmAccountManually
+    events:
+      - httpApi:
+          path: /confirm-account-manually
           method: post
   signIn:
     handler: src/signIn.signIn
