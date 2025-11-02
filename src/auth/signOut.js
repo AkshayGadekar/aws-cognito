@@ -1,5 +1,5 @@
 const { signOut } = require('../cognito')
-const { authMiddleware } = require('./middleware/auth')
+const { authMiddleware } = require('../middleware/auth')
 
 const signOutHandler = async (event) => {
     try {

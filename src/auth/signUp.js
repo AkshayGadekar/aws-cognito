@@ -1,6 +1,6 @@
 const { signUp, confirmAccountByCode, confirmAccountManually, isEmailAutoVerified, markEmailAsVerified } = require('../cognito')
-const { validateFields } = require('./validations')
-const { makeAttributes } = require('./helpers')
+const { validateFields } = require('../validations')
+const { makeAttributes } = require('../helpers')
 
 exports.signUp = async (event) => {
     try {

@@ -1,4 +1,4 @@
-const { getUserInfo } = require('../../cognito')
+const { getUserInfo } = require('../cognito')
 
 exports.authMiddleware = (handler) => {
     return async (event) => {

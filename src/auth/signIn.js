@@ -1,6 +1,6 @@
 
 const { signIn } = require('../cognito')
-const { validateFields } = require('./validations')
+const { validateFields } = require('../validations')
 
 exports.signIn = async (event) => {
     try {

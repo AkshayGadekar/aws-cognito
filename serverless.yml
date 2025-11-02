@@ -126,79 +126,79 @@ resources:
 # API Gateway endpoints
 functions:
   signUp:
-    handler: src/signUp.signUp
+    handler: src/auth/signUp.signUp
     events:
       - httpApi:
           path: /signup
           method: post
   confirmAccountByCode:
-    handler: src/signUp.confirmAccountByCode
+    handler: src/auth/signUp.confirmAccountByCode
     events:
       - httpApi:
           path: /confirm-account-by-code
           method: post
   confirmAccountManually:
-    handler: src/signUp.confirmAccountManually
+    handler: src/auth/signUp.confirmAccountManually
     events:
       - httpApi:
           path: /confirm-account-manually
           method: post
   signIn:
-    handler: src/signIn.signIn
+    handler: src/auth/signIn.signIn
     events:
       - httpApi:
           path: /signin
           method: post
   signOut:
-    handler: src/signOut.signOut
+    handler: src/auth/signOut.signOut
     events:
       - httpApi:
           path: /signout
           method: get
   forgotPassword:
-    handler: src/forgotPassword.forgotPassword
+    handler: src/password/forgotPassword.forgotPassword
     events:
       - httpApi:
           path: /forgot-password
           method: post
   confirmForgotPassword:
-    handler: src/forgotPassword.confirmForgotPassword
+    handler: src/password/forgotPassword.confirmForgotPassword
     events:
       - httpApi:
           path: /confirm-forgot-password
           method: post
   changePassword:
-    handler: src/forgotPassword.changePassword
+    handler: src/password/forgotPassword.changePassword
     events:
       - httpApi:
           path: /change-password
           method: post
   userInfo:
-    handler: src/userInfo.userInfo
+    handler: src/user/userInfo.userInfo
     events:
       - httpApi:
           path: /user-info
           method: get
   updateUser:
-    handler: src/userInfo.updateUser
+    handler: src/user/userInfo.updateUser
     events:
       - httpApi:
           path: /update-user
           method: patch
   generatePresignedUrl:
-    handler: src/userInfo.generatePresignedUrl
+    handler: src/user/userInfo.generatePresignedUrl
     events:
       - httpApi:
           path: /generate-presigned-url
           method: post
   getPresignedPictureUrl:
-    handler: src/userInfo.getPresignedPictureUrl
+    handler: src/user/userInfo.getPresignedPictureUrl
     events:
       - httpApi:
           path: /get-presigned-picture-url
           method: post
   deleteUser:
-    handler: src/userInfo.deleteUser
+    handler: src/user/userInfo.deleteUser
     events:
       - httpApi:
           path: /delete-user

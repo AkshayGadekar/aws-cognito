@@ -1,7 +1,7 @@
 const { updateUserInfo, deleteUser, generatePresignedUrl, getPresignedPictureUrl } = require('../cognito')
-const { authMiddleware } = require('./middleware/auth')
-const { validateFields } = require('./validations')
-const { makeAttributes } = require('./helpers')
+const { authMiddleware } = require('../middleware/auth')
+const { validateFields } = require('../validations')
+const { makeAttributes } = require('../helpers')
 
 const getUserInfoHandler = async (event) => {
     try {

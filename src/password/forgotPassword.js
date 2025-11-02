@@ -1,6 +1,6 @@
 const { forgotPassword, confirmForgotPassword, changePassword } = require('../cognito')
-const { validateFields } = require('./validations')
-const { authMiddleware } = require('./middleware/auth')
+const { validateFields } = require('../validations')
+const { authMiddleware } = require('../middleware/auth')
 
 exports.forgotPassword = async (event) => {
     /**
