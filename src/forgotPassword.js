@@ -3,6 +3,12 @@ const { validateFields } = require('./validations')
 const { authMiddleware } = require('./middleware/auth')
 
 exports.forgotPassword = async (event) => {
+    /**
+     * if you want to reset password for a user
+     * this will send the reset code to the email from Cognito
+     */
+    
+
     try {
         const { email } = JSON.parse(event.body)
         validateFields({ email })
@@ -28,6 +34,10 @@ exports.forgotPassword = async (event) => {
 }
 
 exports.confirmForgotPassword = async (event) => {
+    /**
+     * this will complete the password reset using the confirmation code sent to email from Cognito
+     */
+
     try {
         const { email, code, newPassword } = JSON.parse(event.body)
         validateFields({ email, code, newPassword })
@@ -53,6 +63,12 @@ exports.confirmForgotPassword = async (event) => {
 }
 
 const changePasswordHandler = async (event) => {
+    /**
+     * if you want to change password for a user
+     * this can be used to implement forgot password from your app side instead of using Cognito
+     * trigger this from your app to change the password after implementing your own verification flow
+     */
+
     try {
         const accessToken = event.accessToken
         const { currentPassword, newPassword } = JSON.parse(event.body)

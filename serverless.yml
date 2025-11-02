@@ -17,32 +17,29 @@ provider:
     COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
     S3_BUCKET_NAME: !Ref ProfilePicturesBucket
   iamRoleStatements:
-    - Effect: Allow
+    - Effect: Allow # to upload profile pictures to S3
       Action:
         - s3:PutObject
         - s3:GetObject
       Resource:
         - !Sub arn:aws:s3:::${ProfilePicturesBucket}/*
-    - Effect: Allow
+    - Effect: Allow # to confirm account, update user attributes, and describe user pool
       Action:
         - cognito-idp:AdminConfirmSignUp
         - cognito-idp:AdminUpdateUserAttributes
         - cognito-idp:DescribeUserPool
       Resource:
         - !Sub arn:aws:cognito-idp:${self:provider.region}:${AWS::AccountId}:userpool/${CognitoUserPool}
-  # Uncomment to easily set up a custom domain. Read the docs for more details:
-  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
-  # domain: api.example.com
 
 resources:
   Resources:
     CognitoUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
-        UserPoolName: myUserPool
-        AutoVerifiedAttributes:
+        UserPoolName: myUserPool # name of the user pool
+        AutoVerifiedAttributes: # automatically verifies email addresses, if you have a custom email verification service, you can remove this
           - email
-        Schema:
+        Schema: # attributes of the user
           - Name: name
             AttributeDataType: String
             Required: true
@@ -76,7 +73,7 @@ resources:
             Required: false
             Mutable: true
         Policies:
-          PasswordPolicy:
+          PasswordPolicy: # password policy for the user pool
             MinimumLength: 8
             RequireUppercase: true
             RequireLowercase: true
@@ -85,7 +82,7 @@ resources:
     CognitoUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
-        ClientName: myUserPoolClient
+        ClientName: myUserPoolClient # name of the user pool client
         UserPoolId:
           Ref: CognitoUserPool
         GenerateSecret: false
@@ -93,20 +90,20 @@ resources:
           - ALLOW_USER_PASSWORD_AUTH
           - ALLOW_USER_SRP_AUTH
           - ALLOW_REFRESH_TOKEN_AUTH
-        RefreshTokenValidity: 30
-        AccessTokenValidity: 24
-        IdTokenValidity: 24
+        RefreshTokenValidity: 30 # validity of the refresh token in days
+        AccessTokenValidity: 24 # validity of the access token in hours
+        IdTokenValidity: 24 # validity of the id token in hours
         TokenValidityUnits:
-          RefreshToken: days
-          AccessToken: hours
-          IdToken: hours
+          RefreshToken: days # validity units of the refresh token
+          AccessToken: hours # validity units of the access token
+          IdToken: hours # validity units of the id token
         SupportedIdentityProviders:
           - COGNITO
-        PreventUserExistenceErrors: ENABLED
+        PreventUserExistenceErrors: ENABLED # prevents user existence errors
     ProfilePicturesBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: profile-pictures-bucket-${self:provider.region}
+        BucketName: profile-pictures-bucket-${self:provider.region} # name of the bucket
         PublicAccessBlockConfiguration:
           BlockPublicAcls: true
           BlockPublicPolicy: true
@@ -119,13 +116,14 @@ resources:
             - Id: DeleteIncompleteMultipartUploads
               Status: Enabled
               AbortIncompleteMultipartUpload:
-                DaysAfterInitiation: 1
+                DaysAfterInitiation: 1 # days after initiation to delete incomplete multipart uploads
             - Id: DeleteOldVersions
               Status: Enabled
-              NoncurrentVersionExpirationInDays: 30
+              NoncurrentVersionExpirationInDays: 30 # days after noncurrent version to delete old versions
 
 
 
+# API Gateway endpoints
 functions:
   signUp:
     handler: src/signUp.signUp
