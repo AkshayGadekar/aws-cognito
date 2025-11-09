@@ -155,6 +155,12 @@ functions:
       - httpApi:
           path: /signout
           method: get
+  refreshToken:
+    handler: src/auth/refreshToken.refreshToken
+    events:
+      - httpApi:
+          path: /refresh-token
+          method: post
   forgotPassword:
     handler: src/password/forgotPassword.forgotPassword
     events:

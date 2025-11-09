@@ -87,6 +87,20 @@ exports.signOut = async (AccessToken) => {
     await client.send(command)
 }
 
+exports.refreshToken = async (RefreshToken) => {
+    const command = new InitiateAuthCommand({
+        ClientId,
+        AuthFlow: 'REFRESH_TOKEN',
+        AuthParameters: {
+            REFRESH_TOKEN: RefreshToken
+        }
+    })
+
+    const response = await client.send(command)
+
+    return response
+}
+
 exports.forgotPassword = async (email) => {
     const command = new ForgotPasswordCommand({
         ClientId,

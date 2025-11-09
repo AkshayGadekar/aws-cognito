@@ -15,6 +15,7 @@ const signOutHandler = async (event) => {
         }
 
     } catch (error) {
+        console.error(error)
         return {
             statusCode: 400,
             body: JSON.stringify({
