@@ -43,7 +43,7 @@ exports.validateFields = (fields) => {
 
         if (key === 'gender') {
             // Common gender values - adjust based on your requirements
-            const allowedGenders = ['male', 'female', 'other', 'prefer-not-to-say', 'M', 'F', 'O']
+            const allowedGenders = ['male', 'female', 'other', 'prefer-not-to-say', 'm', 'f', 'o']
             if (!allowedGenders.includes(value.toLowerCase())) {
                 throw new Error('Invalid gender. Must be one of: male, female, other, prefer-not-to-say, M, F, O')
             }
@@ -86,26 +86,16 @@ exports.validateFields = (fields) => {
 
         if (key === 'picture') {
             // Validate URL format
-            try {
-                const url = new URL(value)
-                // Check if it's http or https
-                if (!['http:', 'https:'].includes(url.protocol)) {
-                    throw new Error('Invalid picture URL. Must be HTTP or HTTPS.')
-                }
-                // Check if it's a valid image URL (optional - can be more lenient)
-                const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
-                const pathname = url.pathname.toLowerCase()
-                const hasImageExtension = imageExtensions.some(ext => pathname.endsWith(ext))
-                if (!hasImageExtension && !pathname.includes('image') && !value.includes('s3.amazonaws.com')) {
-                    // Allow S3 URLs and URLs with 'image' in path, but warn about others
-                    // This is lenient to allow various CDN formats
-                }
-            } catch (e) {
-                if (e instanceof TypeError) {
-                    throw new Error('Invalid picture URL format.')
-                }
-                throw new Error('Invalid picture URL.')
+            const url = new URL(value)
+            // Check if it's http or https
+            if (!['http:', 'https:'].includes(url.protocol)) {
+                throw new Error('Invalid picture URL. Must be HTTP or HTTPS.')
             }
+            // Check if it's a valid image URL (optional - can be more lenient)
+            const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+            const pathname = url.pathname.toLowerCase()
+            const hasImageExtension = imageExtensions.some(ext => pathname.endsWith(ext))
+            if (!hasImageExtension) throw new Error('Invalid file extension. Only .jpg, .jpeg, .png, .gif, and .webp are allowed.')
             
             // Check URL length (AWS Cognito attribute limit is 2048 characters)
             if (value.length > 2048) throw new Error('Picture URL must be less than 2048 characters.')
