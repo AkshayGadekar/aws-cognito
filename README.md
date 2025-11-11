@@ -55,8 +55,9 @@ serverless dev
 - `POST /confirm-account-manually` - Manually confirm account (admin)
 
 ### Password Management
-- `POST /forgot-password` - Request password reset code
-- `POST /confirm-forgot-password` - Reset password with code
+- `POST /forgot-password` - Request password reset code (Cognito sends code to email)
+- `POST /confirm-forgot-password` - Reset password with Cognito verification code
+- `POST /reset-password` - Directly reset password (for custom forgot password flow)
 - `POST /change-password` - Change password (requires authentication)
 
 ### User Management
