@@ -26,6 +26,7 @@ provider:
     - Effect: Allow # to confirm account, update user attributes, and describe user pool
       Action:
         - cognito-idp:AdminConfirmSignUp
+        - cognito-idp:AdminSetUserPassword
         - cognito-idp:AdminUpdateUserAttributes
         - cognito-idp:DescribeUserPool
       Resource:
@@ -178,6 +179,12 @@ functions:
     events:
       - httpApi:
           path: /change-password
+          method: post
+  resetPassword:
+    handler: src/password/forgotPassword.resetPassword
+    events:
+      - httpApi:
+          path: /reset-password
           method: post
   userInfo:
     handler: src/user/userInfo.userInfo

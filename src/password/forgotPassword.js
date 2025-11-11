@@ -1,4 +1,4 @@
-const { forgotPassword, confirmForgotPassword, changePassword } = require('../cognito')
+const { forgotPassword, confirmForgotPassword, changePassword, adminSetUserPassword } = require('../cognito')
 const { validateFields } = require('../validations')
 const { authMiddleware } = require('../middleware/auth')
 
@@ -63,12 +63,6 @@ exports.confirmForgotPassword = async (event) => {
 }
 
 const changePasswordHandler = async (event) => {
-    /**
-     * if you want to change password for a user
-     * this can be used to implement forgot password from your app side instead of using Cognito
-     * trigger this from your app to change the password after implementing your own verification flow
-     */
-
     try {
         const accessToken = event.accessToken
         const { currentPassword, newPassword } = JSON.parse(event.body)
@@ -92,6 +86,39 @@ const changePasswordHandler = async (event) => {
             })
         }
     }   
+}
+
+exports.resetPassword = async (event) => {
+    /**
+     * Custom forgot password flow:
+     * 1. Your app sends OTP via your email service
+     * 2. User verifies OTP (you handle this verification)
+     * 3. Call this endpoint to reset password
+     */
+    
+    try {
+        const { email, newPassword } = JSON.parse(event.body)
+        
+        validateFields({ email, password: newPassword })
+        
+        await adminSetUserPassword(email, newPassword)
+        
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                msg: "Password has been successfully reset."
+            })
+        }
+    } catch (error) {
+        console.error(error)
+        return {
+            statusCode: 400,
+            body: JSON.stringify({
+                msg: error.message,
+                error: error.stack
+            })
+        }
+    }
 }
 
 exports.changePassword = authMiddleware(changePasswordHandler)
