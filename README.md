@@ -1,12 +1,25 @@
 # AWS Cognito Authentication Service
 
-A serverless authentication service built with AWS Cognito, Node.js, and Serverless Framework. Provides complete user authentication, profile management, and password reset functionality.
+[![AWS](https://img.shields.io/badge/AWS-Cloud-orange?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
+[![Serverless](https://img.shields.io/badge/Serverless-Framework-red?logo=serverless&logoColor=white)](https://www.serverless.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-green?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
+
+**A production-ready serverless authentication boilerplate** using **AWS Cognito**, **Node.js**, and **Serverless Framework**.  
+Implements signup/login, email verification, JWT-protected APIs, profile management, and S3 presigned uploads — ready to deploy with `serverless deploy`.
+
+## 🧰 Tech Stack
+- **Backend:** Node.js, Serverless Framework, AWS Lambda, API Gateway  
+- **Authentication:** AWS Cognito (JWT-based)  
+- **Storage:** Amazon S3 (Presigned URLs)  
+- **Testing:** Postman, Jest  
+- **Deployment:** Serverless CLI on AWS
 
 ## 📚 API Documentation
 
 Complete API documentation with examples, request/response schemas, and validation rules:
 
-**[View API Documentation on Postman](https://documenter.getpostman.com/view/9882680/2sB3WsQfa7#b6f3c745-d44f-4f25-9942-f9504766f727)**
+**[View API Documentation on Postman](https://documenter.getpostman.com/view/9882680/2sB3WsQfa7)**
 
 ## 🚀 Quick Start
 
@@ -285,4 +298,4 @@ See [LICENSE](LICENSE) file for details.
 
 ## 📞 Support
 
-For detailed API documentation and examples, visit the [Postman documentation](https://documenter.getpostman.com/view/9882680/2sB3WsQfa7#b6f3c745-d44f-4f25-9942-f9504766f727).
+For detailed API documentation and examples, visit the [Postman documentation](https://documenter.getpostman.com/view/9882680/2sB3WsQfa7).
